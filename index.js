@@ -27,6 +27,10 @@ module.exports = (file, options = {}) => {
 		throw new TypeError(`Expected a string, got ${typeof options.outputFile}`);
 	}
 
+	if (!options.dPDFSettings) {
+		options.dPDFSettings = "/default";
+	}
+
 	const ext = path.extname(file).toLowerCase();
 	if (ext !== '.pdf') {
 		throw new TypeError(`Expected a PDF, got ${ext || undefined}`);
@@ -44,8 +48,10 @@ module.exports = (file, options = {}) => {
 	const oldSize = fileSizeInBytes(file);
 
 	try {
-		execSync(`\\gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${options.outputFile} ${file}`);
-		logOptimizationResults(oldSize, file, options.outputFile);
+		execSync(
+      `\\gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=${options.dPDFSettings} -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${options.outputFile} ${file}`
+    );
+		// logOptimizationResults(oldSize, file, options.outputFile);
 	} catch (error) {
 		const errMsg = error.stdout ? error.stdout : error;
 		console.log(errMsg.toString());
